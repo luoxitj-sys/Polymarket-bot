@@ -6,12 +6,15 @@ interface WebSocketMessage {
   payload: unknown;
 }
 
-// Connect to same host:port when served by bot, or port 3001 for dev
-const WS_URL = window.location.port === '5173'
-  ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`:3001`
-const WS_URL = typeof window !== 'undefined'
-  ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`
+// 自动识别当前网页协议：如果是 https 就使用 wss，如果是 http 就使用 ws
+const isBrowser = typeof window !== 'undefined';
+const protocol = isBrowser && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const WS_URL = isBrowser
+  ? (window.location.port === '5173'
+      ? `${protocol}//${window.location.hostname}:3001`
+      : `${protocol}//${window.location.host}`)
   : 'ws://localhost:3001';
+
 const MAX_LOGS = 200;
 
 export function useWebSocket() {
